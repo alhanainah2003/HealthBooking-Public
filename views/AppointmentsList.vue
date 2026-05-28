@@ -35,7 +35,7 @@
                   <select
                     class="form-select"
                     :value="appointment.status"
-                    @change="e => updateStatus(appointment, e.target.value)"
+                    @change="event => updateStatus(appointment, event.target.value)"
                   >
                     <option>Pending</option>
                     <option>In Progress</option>
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-const API_BASE_URL = "https://t99um8xjee.execute-api.us-east-1.amazonaws.com/prod";
+const API_BASE_URL = "https://t99um8xjee.execute-api.us-east-1.amazonaws.com/prod"
 
 export default {
   name: "AppointmentsList",
@@ -67,11 +67,11 @@ export default {
   data() {
     return {
       appointments: []
-    };
+    }
   },
 
   mounted() {
-    this.fetchAppointments();
+    this.fetchAppointments()
   },
 
   methods: {
@@ -79,25 +79,26 @@ export default {
       fetch(`${API_BASE_URL}/appointments`)
         .then(res => {
           if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
+            throw new Error(`HTTP ${res.status}`)
           }
-          return res.json();
+          return res.json()
         })
         .then(data => {
-          this.appointments = Array.isArray(data) ? data : [];
+          this.appointments = Array.isArray(data) ? data : []
         })
         .catch(err => {
-          console.error("Failed to fetch appointments:", err);
-          alert("Failed to load appointments.");
-        });
+          console.error("Failed to fetch appointments:", err)
+          alert("Failed to load appointments.")
+        })
     },
 
     updateStatus(appointment, newStatus) {
-      const url = `${API_BASE_URL}/appointments/${appointment.appointmentId}`;
+      const appointmentId = encodeURIComponent(appointment.appointmentId)
+      const url = `${API_BASE_URL}/appointments/${appointmentId}`
 
       const payload = {
         status: newStatus
-      };
+      }
 
       fetch(url, {
         method: "PATCH",
@@ -107,23 +108,23 @@ export default {
         body: JSON.stringify(payload)
       })
         .then(async res => {
-          const rawBody = await res.text();
+          const rawBody = await res.text()
 
           if (!res.ok) {
-            throw new Error(`HTTP ${res.status}: ${rawBody}`);
+            throw new Error(`HTTP ${res.status}: ${rawBody}`)
           }
 
-          return rawBody ? JSON.parse(rawBody) : {};
+          return rawBody ? JSON.parse(rawBody) : {}
         })
         .then(() => {
-          appointment.status = newStatus;
-          alert("Status updated!");
+          appointment.status = newStatus
+          alert("Status updated successfully!")
         })
         .catch(err => {
-          console.error("Failed to update status:", err);
-          alert("Update failed. See console for details.");
-        });
+          console.error("Failed to update status:", err)
+          alert("Update failed. See console for details.")
+        })
     }
   }
-};
+}
 </script>
