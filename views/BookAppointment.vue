@@ -54,7 +54,7 @@
 </template>
 
 <script>
-const API_BASE_URL = "https://t99um8xjee.execute-api.us-east-1.amazonaws.com/prod";
+const API_BASE_URL = "https://t99um8xjee.execute-api.us-east-1.amazonaws.com/prod/slots";
 
 export default {
   name: "BookAppointment",
