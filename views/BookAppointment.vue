@@ -47,14 +47,13 @@
             </button>
           </div>
         </form>
-
       </div>
     </div>
   </div>
 </template>
 
 <script>
-const API_BASE_URL = "https://t99um8xjee.execute-api.us-east-1.amazonaws.com/prod/slots";
+const API_BASE_URL = "https://t99um8xjee.execute-api.us-east-1.amazonaws.com/prod"
 
 export default {
   name: "BookAppointment",
@@ -65,11 +64,11 @@ export default {
       symptoms: "",
       selectedSlot: "",
       slots: []
-    };
+    }
   },
 
   mounted() {
-    this.fetchSlots();
+    this.fetchSlots()
   },
 
   methods: {
@@ -77,19 +76,19 @@ export default {
       fetch(`${API_BASE_URL}/slots`)
         .then(res => {
           if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
+            throw new Error(`HTTP ${res.status}`)
           }
-          return res.json();
+          return res.json()
         })
         .then(data => {
           this.slots = Array.isArray(data)
-            ? data.filter(s => !s.isBooked).map(s => s.slot)
-            : [];
+            ? data.filter(slot => slot.isBooked === false).map(slot => slot.slot)
+            : []
         })
         .catch(err => {
-          console.error("Failed to fetch slots:", err);
-          alert("Failed to load available slots.");
-        });
+          console.error("Failed to fetch slots:", err)
+          alert("Failed to load available slots.")
+        })
     },
 
     submitAppointment() {
@@ -97,7 +96,7 @@ export default {
         patientName: this.name,
         symptoms: this.symptoms,
         slot: this.selectedSlot
-      };
+      }
 
       fetch(`${API_BASE_URL}/appointments`, {
         method: "POST",
@@ -107,28 +106,28 @@ export default {
         body: JSON.stringify(payload)
       })
         .then(async res => {
-          const rawBody = await res.text();
+          const rawBody = await res.text()
 
           if (!res.ok) {
-            throw new Error(`HTTP ${res.status}: ${rawBody}`);
+            throw new Error(`HTTP ${res.status}: ${rawBody}`)
           }
 
-          return rawBody ? JSON.parse(rawBody) : {};
+          return rawBody ? JSON.parse(rawBody) : {}
         })
         .then(() => {
-          alert("Appointment booked!");
+          alert("Appointment booked successfully!")
 
-          this.name = "";
-          this.symptoms = "";
-          this.selectedSlot = "";
+          this.name = ""
+          this.symptoms = ""
+          this.selectedSlot = ""
 
-          this.fetchSlots();
+          this.fetchSlots()
         })
         .catch(err => {
-          console.error("Error booking appointment:", err);
-          alert("Failed to book appointment.");
-        });
+          console.error("Error booking appointment:", err)
+          alert("Failed to book appointment.")
+        })
     }
   }
-};
+}
 </script>
