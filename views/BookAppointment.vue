@@ -72,18 +72,38 @@ export default {
   },
 
   methods: {
+    parseApiData(data) {
+      if (Array.isArray(data)) {
+        return data
+      }
+
+      if (data && data.body) {
+        try {
+          return JSON.parse(data.body)
+        } catch (error) {
+          console.error("Failed to parse API body:", error)
+          return []
+        }
+      }
+
+      return []
+    },
+
     fetchSlots() {
       fetch(`${API_BASE_URL}/slots`)
         .then(res => {
           if (!res.ok) {
             throw new Error(`HTTP ${res.status}`)
           }
+
           return res.json()
         })
         .then(data => {
-          this.slots = Array.isArray(data)
-            ? data.filter(slot => slot.isBooked === false).map(slot => slot.slot)
-            : []
+          const parsedSlots = this.parseApiData(data)
+
+          this.slots = parsedSlots
+            .filter(slot => slot.isBooked === false)
+            .map(slot => slot.slot)
         })
         .catch(err => {
           console.error("Failed to fetch slots:", err)
@@ -112,7 +132,21 @@ export default {
             throw new Error(`HTTP ${res.status}: ${rawBody}`)
           }
 
-          return rawBody ? JSON.parse(rawBody) : {}
+          if (!rawBody) {
+            return {}
+          }
+
+          const data = JSON.parse(rawBody)
+
+          if (data && data.body) {
+            try {
+              return JSON.parse(data.body)
+            } catch {
+              return data
+            }
+          }
+
+          return data
         })
         .then(() => {
           alert("Appointment booked successfully!")
